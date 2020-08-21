@@ -16,14 +16,23 @@ lambda_arn="$(awslocal lambda create-function --function-name test --runtime nod
 ## Create pool and client
 
 lambda_config='{
-    "PreTokenGeneration": "'$lambda_arn'",
+    "PreSignUp": "'$lambda_arn'",
+    "CustomMessage": "'$lambda_arn'",
+    "PostConfirmation": "'$lambda_arn'",
     "PreAuthentication": "'$lambda_arn'",
-    "PostAuthentication": "'$lambda_arn'"
+    "PostAuthentication": "'$lambda_arn'",
+    "DefineAuthChallenge": "'$lambda_arn'",
+    "CreateAuthChallenge": "'$lambda_arn'",
+    "VerifyAuthChallengeResponse": "'$lambda_arn'",
+    "PreTokenGeneration": "'$lambda_arn'",
+    "UserMigration": "'$lambda_arn'"
 }'
 
 pool_id=$(awslocal cognito-idp create-user-pool --pool-name test --lambda-config "$lambda_config" | jq -rc ".UserPool.Id")
 client_id="$(awslocal cognito-idp create-user-pool-client --user-pool-id "$pool_id" --client-name test-client | jq -rc ".UserPoolClient.ClientId")"
 echo -e "$red Working with user pool ID $pool_id, user pool client ID $client_id $reset"
+
+awslocal cognito-idp list-users --user-pool-id "$pool_id"
 
 ## User sign up
 
@@ -43,16 +52,24 @@ echo -e "$red Attempting to authenticate the not yet verified user - this reques
 awslocal cognito-idp admin-initiate-auth --user-pool-id "$pool_id" --client-id "$client_id" --auth-flow ADMIN_USER_PASSWORD_AUTH --auth-parameters USERNAME=example_user2,PASSWORD=12345678
 echo $?
 
-echo -e "$red Setting password of new user $reset"
+echo -e "$red Setting password of new user 2 $reset"
 awslocal cognito-idp admin-set-user-password --user-pool-id "$pool_id" --username example_user2 --password 12345678 --permanent
 
-echo -e "$red Attempting to authenticate the new user $reset"
-awslocal cognito-idp admin-initiate-auth --user-pool-id "$pool_id" --client-id "$client_id" --auth-flow ADMIN_USER_PASSWORD_AUTH --auth-parameters USERNAME=example_user2,PASSWORD=12345678
+echo -e "$red Attempting to authenticate the new user 2 $reset"
+result="$(awslocal cognito-idp admin-initiate-auth --user-pool-id "$pool_id" --client-id "$client_id" --auth-flow ADMIN_USER_PASSWORD_AUTH --auth-parameters USERNAME=example_user2,PASSWORD=12345678)"
+echo "$result"
+refresh_token="$(echo "$result" | jq -r .AuthenticationResult.RefreshToken)"
+echo -e "$red Attempting to initiate REFRESH_TOKEN_AUTH for the new user 2 $reset"
+awslocal cognito-idp initiate-auth --auth-flow REFRESH_TOKEN_AUTH --client-id "$client_id" --auth-parameters "REFRESH_TOKEN=$refresh_token"
 
 ## "Admin creates the user" with "user initiates auth" workflow
 
+echo -e "$red Admin creating new user 3 $reset"
 awslocal cognito-idp admin-create-user --user-pool-id "$pool_id" --username example_user3 --temporary-password "ChangeMe"
 
+echo -e "$red Attempting to authenticate the new user 3 $reset"
 session=$(awslocal cognito-idp initiate-auth --auth-flow "USER_PASSWORD_AUTH" --auth-parameters USERNAME=example_user3,PASSWORD="ChangeMe" --client-id "$client_id" | jq -r '.Session')
 
 awslocal cognito-idp admin-respond-to-auth-challenge --user-pool-id "$pool_id" --client-id "$client_id" --challenge-responses "NEW_PASSWORD=FinalPassword,USERNAME=example_user3" --challenge-name NEW_PASSWORD_REQUIRED --session "$session"
+
+awslocal cognito-idp list-users --user-pool-id "$pool_id"
