@@ -1,0 +1,14 @@
+version: "3.4"
+services:
+    localstack:
+        image: localstack/localstack-full:latest
+        environment:
+            LOCALSTACK_API_KEY: ${LOCALSTACK_API_KEY?Please set the LOCALSTACK_API_KEY environment variable.}
+            LOCALSTACK_SERVICES: cognito-idp,lambda
+            DEBUG: 1
+            HOST_TMP_FOLDER: /tmp
+        volumes:
+            - "${TMPDIR:-/tmp/localstack}:/tmp/localstack"
+            - "/var/run/docker.sock:/var/run/docker.sock"
+            - "./lambda/:/src/"
+            - "./docker-entrypoint-initaws.d/:/docker-entrypoint-initaws.d/"
