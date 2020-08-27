@@ -1,5 +1,6 @@
 This repo reproduces this issue: https://github.com/localstack/localstack/issues/2893
 
+(The name is a misnomer; it was repurposed from [a previous issue](https://github.com/localstack/localstack/issues/2858))
 
 ## Usage
 
