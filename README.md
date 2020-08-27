@@ -1,4 +1,5 @@
-This repo reproduces this issue: https://github.com/localstack/localstack/issues/2858
+This repo reproduces this issue: https://github.com/localstack/localstack/issues/2893
+
 
 ## Usage
 
