@@ -2,6 +2,7 @@ version: "3.4"
 services:
     localstack:
         image: localstack/localstack-full:latest
+        container_name: localstack_main
         environment:
             LOCALSTACK_API_KEY: ${LOCALSTACK_API_KEY?Please set the LOCALSTACK_API_KEY environment variable.}
             LOCALSTACK_SERVICES: cognito-idp,lambda

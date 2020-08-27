@@ -19,3 +19,10 @@ But that they are not provided in the `event.request.userAttributes` passed to t
 ```
 docker-compose logs | grep Attributes
 ```
+
+
+Grepping the logs for `triggerSource` shows that none of the [Pre Token Generation Lambda Trigger Sources](https://docs.aws.amazon.com/cognito/latest/developerguide/user-pool-lambda-pre-token-generation.html#user-pool-lambda-pre-token-generation-trigger-source) are triggering Lambdas.
+
+See also:
+
+- [User Pool Lambda Trigger Sources](https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-identity-pools-working-with-aws-lambda-triggers.html#cognito-user-identity-pools-working-with-aws-lambda-trigger-sources)
