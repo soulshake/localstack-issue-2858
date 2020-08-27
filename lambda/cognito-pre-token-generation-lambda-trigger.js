@@ -3,6 +3,8 @@
 //   - https://docs.aws.amazon.com/cognito/latest/developerguide/user-pool-lambda-pre-token-generation.html
 //   - https://hasura.io/docs/1.0/graphql/manual/auth/authentication/jwt.html
 exports.handler = (event, context, callback) => {
+    console.log("______ event ______")
+    console.log(JSON.stringify(event))
     event.response = {
         claimsOverrideDetails: {
             claimsToAddOrOverride: {

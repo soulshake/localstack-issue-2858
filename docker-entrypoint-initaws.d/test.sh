@@ -28,7 +28,7 @@ echo -e "$red Working with user pool ID $pool_id, user pool client ID $client_id
 ## User sign up
 
 echo -e "$red Starting user signup flow $reset"
-awslocal cognito-idp sign-up --client-id "$client_id" --username example_user --password 12345678 --user-attributes Name=email,Value="$USER_EMAIL"
+awslocal cognito-idp sign-up --client-id "$client_id" --username example_user --password 12345678 --user-attributes "Name=email,Value=$USER_EMAIL" "Name=sub,Value=abcde-lalala-etc"
 
 echo -e "$red Confirming user $reset"
 awslocal cognito-idp admin-confirm-sign-up --user-pool-id "$pool_id" --username example_user
@@ -56,3 +56,5 @@ awslocal cognito-idp admin-create-user --user-pool-id "$pool_id" --username exam
 session=$(awslocal cognito-idp initiate-auth --auth-flow "USER_PASSWORD_AUTH" --auth-parameters USERNAME=example_user3,PASSWORD="ChangeMe" --client-id "$client_id" | jq -r '.Session')
 
 awslocal cognito-idp admin-respond-to-auth-challenge --user-pool-id "$pool_id" --client-id "$client_id" --challenge-responses "NEW_PASSWORD=FinalPassword,USERNAME=example_user3" --challenge-name NEW_PASSWORD_REQUIRED --session "$session"
+
+awslocal cognito-idp list-users --user-pool-id "$pool_id"
