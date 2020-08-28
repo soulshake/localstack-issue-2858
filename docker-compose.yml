@@ -2,12 +2,21 @@ version: "3.4"
 services:
     localstack:
         image: localstack/localstack-full:latest
-        container_name: localstack_main
+        # container_name: localstack_main
         environment:
+            FAKE_USERNAME: fake@example.bio
+            FAKE_PASSWORD: password
+            FAKE_EMAIL: fake@example.com
+            EDGE_PORT: 6666
             LOCALSTACK_API_KEY: ${LOCALSTACK_API_KEY?Please set the LOCALSTACK_API_KEY environment variable.}
             LOCALSTACK_SERVICES: cognito-idp,lambda
             DEBUG: 1
             HOST_TMP_FOLDER: /tmp
+            AWS_DEFAULT_REGION: us-east-2
+            AWS_SECRET_ACCESS_KEY: fake
+            AWS_ACCESS_KEY_ID: fake
+        ports:
+            - "6666:6666"
         volumes:
             - "${TMPDIR:-/tmp/localstack}:/tmp/localstack"
             - "/var/run/docker.sock:/var/run/docker.sock"
